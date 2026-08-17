@@ -1,0 +1,4 @@
+.venv
+*.lock
+**/**egg**
+**/__pycache__/
