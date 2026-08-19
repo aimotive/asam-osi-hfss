@@ -1,18 +1,11 @@
 @startuml antenna
 
-struct Antenna {
-    array<AntennaElementInstance> elements
-    ArraySetup arrangement
-
-    CreateElementInstance(AntennaElement element, Position position) -> AntennaElementInstance
-}
-
 class AntennaElementInstance {
     uint idx
     Position position
     AntennaElement element
 
-    Sample(float frequency, float azimuth, float elevation) -> ComplexSample
+    Sample(float frequency, float azimuth) -> ComplexSample
 }
 
 struct AntennaElement {
@@ -26,8 +19,6 @@ struct ComplexSample {
 }
 
 AntennaElementInstance o-- ComplexSample
-
-Antenna o-- AntennaElementInstance
 
 AntennaElementInstance o-- AntennaElement
 
