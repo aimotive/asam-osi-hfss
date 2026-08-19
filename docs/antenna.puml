@@ -1,0 +1,85 @@
+@startuml antenna
+
+struct Antenna {
+    array<AntennaElementInstance> elements
+    ArraySetup arrangement
+
+    CreateElementInstance(AntennaElement element, Position position) -> AntennaElementInstance
+}
+
+class AntennaElementInstance {
+    uint idx
+    Position position
+    AntennaElement element
+
+    Sample(float frequency, float azimuth, float elevation) -> ComplexSample
+}
+
+struct AntennaElement {
+    array<FrequencyInstance> properties
+    RxTMode mode
+}
+
+struct ComplexSample {
+    float amplitude
+    float phase
+}
+
+AntennaElementInstance o-- ComplexSample
+
+Antenna o-- AntennaElementInstance
+
+AntennaElementInstance o-- AntennaElement
+
+enum RxTMode {
+    Receiver
+    Transmitter
+}
+
+AntennaElement o-- RxTMode
+
+struct Position {
+    float x
+    float y
+    float z
+}
+
+AntennaElementInstance o-- Position
+
+struct FrequencyInstance {
+    float frequency
+    RadiationProperties radiation
+    float gain
+    float phase
+    float axial_ratio
+}
+
+AntennaElement o-- FrequencyInstance
+
+struct RadiationProperties {  
+    RadiationPattern hh
+    RadiationPattern vv
+    RadiationPattern hv
+}
+
+FrequencyInstance o-- RadiationProperties
+
+struct RadiationPattern {
+    AmplitudePattern amplitude
+    PhasePattern phase
+}
+
+RadiationProperties o-- RadiationPattern
+
+struct AmplitudePattern {
+    array<float> amplitude
+}
+
+struct PhasePattern {
+    array<float> phase
+}
+
+RadiationPattern o-- AmplitudePattern
+RadiationPattern o-- PhasePattern
+
+@enduml
