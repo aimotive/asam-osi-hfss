@@ -46,7 +46,7 @@ class ULA:
         return np.exp(1j * self.k * self.positions * np.sin(theta))
 
     def element_response_vector(
-        self, azimuth_deg: float, elevation_deg: float = 0.0
+        self, azimuth_deg: float, elevation_deg: float = 90.0
     ) -> np.ndarray:
         direction = Direction(
             azimuth=float(azimuth_deg), elevation=float(elevation_deg)
@@ -54,8 +54,8 @@ class ULA:
         elem = np.zeros(len(self.elements), dtype=np.complex128)
 
         for i, el in enumerate(self.elements):
-            s = el.sample(frequency=self.frequency, direction=direction)
-            elem[i] = s.amplitude * np.exp(1j * s.phase)
+            s, _ = el.sample(frequency=self.frequency, direction=direction)
+            elem[i] = s.amplitude * np.exp(1j * np.deg2rad(s.phase))
 
         return elem * self._spatial_phase(azimuth_deg)
 
@@ -71,7 +71,7 @@ class ULA:
         self,
         steer_angle_deg: float,
         taper: Taper = "uniform",
-        elevation_deg: float = 0.0,
+        elevation_deg: float = 90.0,
     ) -> np.ndarray:
         a0 = self.element_response_vector(steer_angle_deg, elevation_deg)
         w = a0 * self._taper(taper)
@@ -85,7 +85,7 @@ class ULA:
         steer_angle_deg: float,
         scan_angles_deg: np.ndarray,
         taper: Taper = "uniform",
-        elevation_deg: float = 0.0,
+        elevation_deg: float = 90.0,
     ) -> BeamScanResult:
         w = self.steering_weights(
             steer_angle_deg=steer_angle_deg,
