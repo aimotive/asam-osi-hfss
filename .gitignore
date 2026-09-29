@@ -2,3 +2,6 @@
 *.lock
 **/**egg**
 **/__pycache__/
+# generated protobuf bindings
+build/
+src/osi3/
