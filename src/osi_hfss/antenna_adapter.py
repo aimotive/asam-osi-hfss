@@ -35,8 +35,6 @@ def to_proto(model: AntennaModel) -> osi_antenna_pb2.AntennaModel:
             msg_f = msg_type.frequency_instance.add(
                 frequency=f.frequency, gain=f.gain, phase=f.phase
             )
-            if f.axial_ratio is not None:
-                msg_f.axial_ratio = f.axial_ratio
             msg_f.radiation.horizontal_angle.extend(f.radiation.horizontal_angle)
             msg_f.radiation.vertical_angle.extend(f.radiation.vertical_angle)
             for name in GRIDS:
@@ -86,9 +84,6 @@ def from_proto(msg: osi_antenna_pb2.AntennaModel) -> AntennaModel:
                         gain=f.gain,
                         phase=f.phase,
                         radiation=_jones_pattern(f.radiation),
-                        axial_ratio=f.axial_ratio
-                        if f.HasField("axial_ratio")
-                        else None,
                     )
                     for f in t.frequency_instance
                 ],

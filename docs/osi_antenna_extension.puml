@@ -67,7 +67,6 @@ package "osi_antenna.proto (new)" {
         double frequency
         double gain
         double phase
-        double axial_ratio
         JonesPattern radiation
     }
 
@@ -121,7 +120,7 @@ JonesMatrix o-- ComplexValue
 
 note bottom of AntennaModel
   src/antenna/element.py mirrors this package one to one
-  and adds evaluation: jones(), response(), elements(mode),
+  and adds evaluation: jones(), response(), receive(), elements(mode),
   resampled(step) and Direction.
 end note
 

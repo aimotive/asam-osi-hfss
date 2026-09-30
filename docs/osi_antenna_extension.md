@@ -60,15 +60,12 @@ angle convention (horizontal / vertical angle 0 = boresight).
 | `ComplexValue` | `ComplexValue` |
 
 The Python classes add evaluation on top: `AntennaModel.jones`,
-`AntennaModel.response`, `AntennaModel.elements(mode)` and
+`AntennaModel.response`, `AntennaModel.receive`, `AntennaModel.elements(mode)` and
 `AntennaModel.resampled(step)`.
 
 [`src/osi_hfss/antenna_adapter.py`](../src/osi_hfss/antenna_adapter.py) is a
 plain field copy (`to_proto`, `from_proto`); the only other function,
 `to_legacy_diagram`, derives the upstream dB diagram.
-
-Jones convention: `E_0 = J_00 e_0 + J_10 e_1`, `E_1 = J_01 e_0 + J_11 e_1`,
-i.e. `J = [[pattern_00, pattern_10], [pattern_01, pattern_11]]`.
 
 ## Compatibility
 
@@ -83,11 +80,18 @@ i.e. `J = [[pattern_00, pattern_10], [pattern_01, pattern_11]]`.
 
 ## Open questions
 
-- Pattern size vs. grid resolution (2° grid ≈ 1 MB per element type);
+- Pattern size vs. grid resolution (2° grid over ±90° ≈ 0.5 MB per element type);
   external pattern references or harmonic expansions.
 - Interpolation between grid points and between frequency instances.
 - Additional per-ray phase beyond `time_of_flight` (currently carried by the
   phase of `polarimetric_response`).
+- Rotated elements: `AntennaElement.orientation` is defined, but rotating the
+  direction and the polarization basis is not implemented yet (the Python
+  model rejects non-zero orientations).
+- Transceiver elements (one element used for Tx and Rx) cannot be expressed
+  with `AntennaElementType.Mode`.
+- Near-field / bistatic Tx and Rx positions (arrival ≠ departure direction)
+  for multi-bounce paths.
 
 ## Examples
 

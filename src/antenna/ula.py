@@ -3,7 +3,7 @@ from typing import Literal
 
 import numpy as np
 
-from .element import AntennaModel, Direction, Mode, Radian
+from .element import SPEED_OF_LIGHT, AntennaModel, Direction, Mode, Radian
 
 Taper = Literal["uniform", "hann"]
 
@@ -25,7 +25,7 @@ class ULA:
         self.model = model
         self.elements = model.elements(mode)
         self.frequency = float(frequency)
-        self.wavelength = 3e8 / self.frequency
+        self.wavelength = SPEED_OF_LIGHT / self.frequency
         self.k = 2.0 * np.pi / self.wavelength
         self.positions = np.array([e.position.to_array() for e in self.elements])
 

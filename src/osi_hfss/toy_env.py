@@ -10,6 +10,7 @@ from dataclasses import dataclass
 
 import numpy as np
 
+from antenna.element import SPEED_OF_LIGHT
 from osi3 import (
     osi_groundtruth_pb2,
     osi_object_pb2,
@@ -17,8 +18,6 @@ from osi3 import (
     osi_sensorviewconfiguration_pb2,
     osi_version_pb2,
 )
-
-SPEED_OF_LIGHT = 299_792_458.0
 
 RadarSensorViewConfiguration = (
     osi_sensorviewconfiguration_pb2.RadarSensorViewConfiguration

@@ -1,9 +1,7 @@
 """Jones matrix based antenna model.
 
-The structure mirrors `osi_antenna.proto` of the osi-hfss OSI fork one to one:
-same message names, field names, enum values and units (rad, dB, Hz, m).
-Angles follow the OSI `Spherical3d` convention: horizontal (azimuth) and
-vertical (elevation) angle 0 is boresight.
+The structure mirrors `osi_antenna.proto` of the OSI fork one to one: same
+message names, field names, enum values and units (rad, dB, Hz, m).
 """
 
 from dataclasses import dataclass, field
@@ -14,13 +12,17 @@ import numpy as np
 
 type Radian = float
 
+SPEED_OF_LIGHT = 299_792_458.0  # m/s
+
 
 class PolarizationBasis(Enum):
     UNKNOWN = 0
     OTHER = 1
-    # index 0 = horizontal (H), index 1 = vertical (V)
+    # index 0 = e_H
+    # index 1 = e_V
     LINEAR_HV = 2
-    # index 0 = left hand (L), index 1 = right hand (R)
+    # index 0 = e_L
+    # index 1 = e_R
     CIRCULAR_LR = 3
 
 
@@ -95,7 +97,8 @@ class JonesPattern:
     """Complex polarimetric far-field pattern on a regular angular grid.
 
     For an excitation e = (e_0, e_1) the radiated field is E = J @ e with
-    J = [[pattern_00, pattern_10], [pattern_01, pattern_11]].
+    J = [[pattern_00, pattern_01], [pattern_10, pattern_11]], i.e.
+    pattern_rt maps excitation component t to field component r.
     """
 
     horizontal_angle: np.ndarray
@@ -127,8 +130,8 @@ class JonesPattern:
         idx = self.closest_indices(direction)
         return np.array(
             [
-                [self.pattern_00.value_at(idx), self.pattern_10.value_at(idx)],
-                [self.pattern_01.value_at(idx), self.pattern_11.value_at(idx)],
+                [self.pattern_00.value_at(idx), self.pattern_01.value_at(idx)],
+                [self.pattern_10.value_at(idx), self.pattern_11.value_at(idx)],
             ]
         )
 
@@ -159,10 +162,9 @@ class JonesPattern:
 @dataclass(frozen=True)
 class FrequencyInstance:
     frequency: float  # Hz
-    gain: float  # dB, amplitude (20 * log10 of the linear factor)
+    gain: float  # dB, realized gain for a pattern amplitude of 1
     phase: Radian
     radiation: JonesPattern
-    axial_ratio: float | None = None  # dB
 
     def jones(self, direction: Direction) -> np.ndarray:
         factor = 10.0 ** (self.gain / 20.0) * np.exp(1j * self.phase)
@@ -174,7 +176,6 @@ class FrequencyInstance:
             gain=self.gain,
             phase=self.phase,
             radiation=self.radiation.resampled(step),
-            axial_ratio=self.axial_ratio,
         )
 
 
@@ -217,6 +218,8 @@ class AntennaModel:
         self, element: AntennaElement, frequency: float, direction: Direction
     ) -> np.ndarray:
         """2x2 Jones matrix of an element incl. gain and phase."""
+        if element.orientation != Orientation3d():
+            raise NotImplementedError("Rotated antenna elements are not supported yet.")
         instance = self.type_of(element).closest_frequency_instance(frequency)
         return instance.jones(direction)
 
@@ -231,6 +234,16 @@ class AntennaModel:
         if excitation is None:
             excitation = np.array([1.0, 0.0])
         return self.jones(element, frequency, direction) @ excitation
+
+    def receive(
+        self,
+        element: AntennaElement,
+        frequency: float,
+        direction: Direction,
+        incident_field: np.ndarray,
+    ) -> np.ndarray:
+        """Port signals for a field incident from `direction` (reciprocity)."""
+        return self.jones(element, frequency, direction).T @ incident_field
 
     def resampled(self, step: Radian) -> "AntennaModel":
         return AntennaModel(
