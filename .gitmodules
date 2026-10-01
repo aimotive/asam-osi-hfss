@@ -1,0 +1,4 @@
+[submodule "third_party/open-simulation-interface"]
+	path = third_party/open-simulation-interface
+	url = https://github.com/OpenSimulationInterface/open-simulation-interface.git
+	branch = feature/antenna-model

@@ -3,61 +3,46 @@ from typing import Literal
 
 import numpy as np
 
-from .element import AntennaElementInstance, Direction
+from .element import SPEED_OF_LIGHT, AntennaModel, Direction, Mode, Radian
 
-Axis = Literal["x", "y", "z"]
 Taper = Literal["uniform", "hann"]
 
 
 @dataclass(frozen=True)
 class BeamScanResult:
-    scan_angles_deg: np.ndarray
+    scan_angles: np.ndarray  # rad
     power_linear: np.ndarray
     power_db: np.ndarray
-    peak_angle_deg: float
+    peak_angle: Radian
 
 
 class ULA:
+    """Linear array formed by the elements of one mode of an `AntennaModel`."""
+
     def __init__(
-        self,
-        elements: list[AntennaElementInstance],
-        frequency: float,
-        axis: Axis = "x",
+        self, model: AntennaModel, frequency: float, mode: Mode = Mode.RECEIVE
     ):
-        self.elements = elements
+        self.model = model
+        self.elements = model.elements(mode)
         self.frequency = float(frequency)
-        self.wavelength = 3e8 / self.frequency
-        self.axis = axis
+        self.wavelength = SPEED_OF_LIGHT / self.frequency
         self.k = 2.0 * np.pi / self.wavelength
-        self.positions = np.array(
-            [self._axis_position(el) for el in elements], dtype=float
-        )
+        self.positions = np.array([e.position.to_array() for e in self.elements])
 
-    def _axis_position(self, element: AntennaElementInstance) -> float:
-        p = element.position
-        if self.axis == "x":
-            return p.x
-        if self.axis == "y":
-            return p.y
-        return p.z
-
-    def _spatial_phase(self, angle_deg: float) -> np.ndarray:
-        theta = np.deg2rad(angle_deg)
-        return np.exp(1j * self.k * self.positions * np.sin(theta))
+    def _spatial_phase(self, direction: Direction) -> np.ndarray:
+        return np.exp(1j * self.k * self.positions @ direction.unit_vector())
 
     def element_response_vector(
-        self, azimuth_deg: float, elevation_deg: float = 90.0
+        self, horizontal: Radian, vertical: Radian = 0.0
     ) -> np.ndarray:
-        direction = Direction(
-            azimuth=float(azimuth_deg), elevation=float(elevation_deg)
+        direction = Direction(horizontal=float(horizontal), vertical=float(vertical))
+        elem = np.array(
+            [
+                self.model.response(e, self.frequency, direction)[0]
+                for e in self.elements
+            ]
         )
-        elem = np.zeros(len(self.elements), dtype=np.complex128)
-
-        for i, el in enumerate(self.elements):
-            s, _ = el.sample(frequency=self.frequency, direction=direction)
-            elem[i] = s.amplitude * np.exp(1j * np.deg2rad(s.phase))
-
-        return elem * self._spatial_phase(azimuth_deg)
+        return elem * self._spatial_phase(direction)
 
     def _taper(self, kind: Taper) -> np.ndarray:
         n = len(self.elements)
@@ -69,11 +54,11 @@ class ULA:
 
     def steering_weights(
         self,
-        steer_angle_deg: float,
+        steer_angle: Radian,
         taper: Taper = "uniform",
-        elevation_deg: float = 90.0,
+        vertical: Radian = 0.0,
     ) -> np.ndarray:
-        a0 = self.element_response_vector(steer_angle_deg, elevation_deg)
+        a0 = self.element_response_vector(steer_angle, vertical)
         w = a0 * self._taper(taper)
         norm = np.linalg.norm(w)
         if norm < 1e-15:
@@ -82,20 +67,20 @@ class ULA:
 
     def beam_scan(
         self,
-        steer_angle_deg: float,
-        scan_angles_deg: np.ndarray,
+        steer_angle: Radian,
+        scan_angles: np.ndarray,
         taper: Taper = "uniform",
-        elevation_deg: float = 90.0,
+        vertical: Radian = 0.0,
     ) -> BeamScanResult:
         w = self.steering_weights(
-            steer_angle_deg=steer_angle_deg,
+            steer_angle=steer_angle,
             taper=taper,
-            elevation_deg=elevation_deg,
+            vertical=vertical,
         )
 
-        power = np.zeros_like(scan_angles_deg, dtype=float)
-        for i, ang in enumerate(scan_angles_deg):
-            a = self.element_response_vector(float(ang), elevation_deg)
+        power = np.zeros_like(scan_angles, dtype=float)
+        for i, ang in enumerate(scan_angles):
+            a = self.element_response_vector(float(ang), vertical)
             y = np.vdot(w, a)
             power[i] = np.abs(y) ** 2
 
@@ -104,8 +89,8 @@ class ULA:
         peak_idx = int(np.argmax(power))
 
         return BeamScanResult(
-            scan_angles_deg=scan_angles_deg,
+            scan_angles=scan_angles,
             power_linear=power,
             power_db=power_db,
-            peak_angle_deg=float(scan_angles_deg[peak_idx]),
+            peak_angle=float(scan_angles[peak_idx]),
         )

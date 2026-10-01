@@ -1,0 +1,132 @@
+@startuml osi_antenna_extension
+
+package "osi_sensorviewconfiguration.proto" {
+    struct RadarSensorViewConfiguration {
+        Identifier sensor_id
+        MountingPosition mounting_position
+        double field_of_view_horizontal
+        double field_of_view_vertical
+        double emitter_frequency
+        array<AntennaDiagramEntry> tx_antenna_diagram
+        array<AntennaDiagramEntry> rx_antenna_diagram
+        + AntennaModel antenna_model
+        + AntennaApplication antenna_application
+    }
+
+    struct AntennaDiagramEntry {
+        double horizontal_angle
+        double vertical_angle
+        double response
+    }
+
+    enum AntennaApplication {
+        UNKNOWN
+        ENVIRONMENT
+        SENSOR_MODEL
+    }
+}
+
+package "osi_sensorview.proto" {
+    struct Reflection {
+        double signal_strength
+        double time_of_flight
+        double doppler_shift
+        double source_horizontal_angle
+        double source_vertical_angle
+        + double arrival_horizontal_angle
+        + double arrival_vertical_angle
+        + JonesMatrix polarimetric_response
+    }
+}
+
+package "osi_antenna.proto (new)" {
+    struct AntennaModel {
+        Identifier id
+        PolarizationBasis polarization_basis
+        array<AntennaElementType> element_type
+        array<AntennaElement> element
+    }
+
+    enum PolarizationBasis {
+        LINEAR_HV
+        CIRCULAR_LR
+    }
+
+    struct AntennaElementType {
+        Identifier id
+        Mode mode
+        array<FrequencyInstance> frequency_instance
+    }
+
+    enum Mode {
+        RECEIVE
+        TRANSMIT
+    }
+
+    struct FrequencyInstance {
+        double frequency
+        double gain
+        double phase
+        JonesPattern radiation
+    }
+
+    struct JonesPattern {
+        array<double> horizontal_angle
+        array<double> vertical_angle
+        ComplexGrid pattern_00
+        ComplexGrid pattern_11
+        ComplexGrid pattern_01
+        ComplexGrid pattern_10
+    }
+
+    struct ComplexGrid {
+        array<double> amplitude
+        array<double> phase
+    }
+
+    struct AntennaElement {
+        uint32 index
+        Identifier element_type_id
+        Vector3d position
+        Orientation3d orientation
+    }
+
+    struct JonesMatrix {
+        ComplexValue m00
+        ComplexValue m01
+        ComplexValue m10
+        ComplexValue m11
+    }
+
+    struct ComplexValue {
+        double amplitude
+        double phase
+    }
+}
+
+RadarSensorViewConfiguration o-- AntennaDiagramEntry
+RadarSensorViewConfiguration o-- AntennaApplication
+RadarSensorViewConfiguration o-- AntennaModel
+Reflection o-- JonesMatrix
+AntennaModel o-- PolarizationBasis
+AntennaModel o-- AntennaElementType
+AntennaModel o-- AntennaElement
+AntennaElement ..> AntennaElementType : element_type_id
+AntennaElementType o-- Mode
+AntennaElementType o-- FrequencyInstance
+FrequencyInstance o-- JonesPattern
+JonesPattern o-- ComplexGrid
+JonesMatrix o-- ComplexValue
+
+note bottom of AntennaModel
+  src/antenna/element.py mirrors this package one to one
+  and adds evaluation: jones(), response(), receive(), elements(mode),
+  resampled(step) and Direction.
+end note
+
+legend right
+  + marks fields added by the osi-hfss fork;
+  all other fields are unchanged upstream OSI v3.8.0
+endlegend
+
+@enduml
