@@ -1,4 +1,4 @@
-[submodule "third_party/open-simulation-interface-aim"]
-	path = third_party/open-simulation-interface-aim
-	url = https://github.com/aimotive/open-simulation-interface.git
-	branch = feat/antenna-model
+[submodule "third_party/open-simulation-interface"]
+	path = third_party/open-simulation-interface
+	url = https://github.com/OpenSimulationInterface/open-simulation-interface.git
+	branch = feature/antenna-model

@@ -1,8 +1,8 @@
 """Generate the ``osi3`` Python bindings from the OSI submodule.
 
-The submodule tracks the osi-hfss fork branch, which contains the antenna
-extension on top of upstream OSI. Use ``--upstream-only`` to build the plain
-upstream release it is based on instead.
+The submodule tracks the upstream OSI branch ``feature/antenna-model``, which
+contains the antenna extension on top of OSI v3.8.0. Use ``--upstream-only``
+to build the plain upstream release it is based on instead.
 
     uv run python scripts/build_proto.py [--upstream-only]
 """
@@ -17,7 +17,7 @@ from pathlib import Path
 from grpc_tools import protoc
 
 ROOT = Path(__file__).resolve().parents[1]
-OSI_DIR = ROOT / "third_party" / "open-simulation-interface-aim"
+OSI_DIR = ROOT / "third_party" / "open-simulation-interface"
 UPSTREAM_REF = "v3.8.0"
 BUILD_DIR = ROOT / "build" / "proto"
 PROTO_PKG_DIR = BUILD_DIR / "osi3"
@@ -92,7 +92,7 @@ def main() -> None:
     write_protos(read_sources(UPSTREAM_REF if args.upstream_only else None))
     compile_protos()
 
-    variant = f"upstream {UPSTREAM_REF}" if args.upstream_only else "osi-hfss fork"
+    variant = f"upstream {UPSTREAM_REF}" if args.upstream_only else "feature/antenna-model"
     print(f"Generated osi3 bindings ({variant}) in {OUT_DIR / 'osi3'}")
 
 

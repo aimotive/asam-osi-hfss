@@ -32,4 +32,4 @@ uv run python scripts/build_proto.py # generates the osi3 bindings in src/osi3
 
 For an existing clone, run `git submodule update --init` instead of `--recursive`.
 
-The submodule `third_party/open-simulation-interface-aim` tracks the branch `feat/antenna-model` of the fork `aimotive/open-simulation-interface` (OSI v3.8.0 plus the antenna extension). `scripts/build_proto.py --upstream-only` builds the plain upstream `v3.8.0` bindings from the same submodule.
+The submodule `third_party/open-simulation-interface` tracks the branch `feature/antenna-model` of the upstream `OpenSimulationInterface/open-simulation-interface` repository (OSI v3.8.0 plus the antenna extension). `scripts/build_proto.py --upstream-only` builds the plain upstream `v3.8.0` bindings from the same submodule.
