@@ -1,0 +1,5 @@
+#!/bin/sh
+# GroundTruth + SensorViewConfiguration + object radar properties (JSON) -> SensorView.
+# Usage: environment-simulation --ground-truth F --configuration F --scene F.json [-o F]
+# This launcher runs the implementation in lib/radar-modules; replace it to use another implementation.
+exec "$(dirname "$0")/lib/radar-modules" environment-simulation "$@"

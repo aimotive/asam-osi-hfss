@@ -1,7 +1,11 @@
 .venv
-*.lock
 **/**egg**
 **/__pycache__/
 # generated protobuf bindings
 build/
 src/osi3/
+*.png
+*.bin
+
+!data/*.bin
+!tests/reference/*.bin

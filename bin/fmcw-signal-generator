@@ -1,0 +1,5 @@
+#!/bin/sh
+# FMCW TDM-MIMO signal generator: SensorView + AntennaModel -> RadarCpiData.
+# Usage: fmcw-signal-generator --sensor-view F --antenna F [--config F.json] [--raw] [--noise-free] [--encoding E] [--description F.json] [-o F]
+# This launcher runs the implementation in lib/radar-modules; replace it to use another implementation.
+exec "$(dirname "$0")/lib/radar-modules" fmcw-signal-generator "$@"

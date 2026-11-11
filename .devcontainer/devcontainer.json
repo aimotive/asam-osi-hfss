@@ -1,0 +1,24 @@
+{
+  "name": "asam-osi-hfss",
+  "build": { "dockerfile": "Dockerfile", "options": ["--platform=linux/amd64"] },
+  "runArgs": ["--platform=linux/amd64"],
+  "remoteUser": "ubuntu",
+  "containerEnv": {
+    "UV_PROJECT_ENVIRONMENT": "/home/ubuntu/.venvs/asam-osi-hfss"
+  },
+  "postCreateCommand": "bash .devcontainer/post-create.sh",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-toolsai.jupyter",
+        "zxh404.vscode-proto3"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/home/ubuntu/.venvs/asam-osi-hfss/bin/python",
+        "python.testing.pytestEnabled": true,
+        "jupyter.notebookFileRoot": "${workspaceFolder}"
+      }
+    }
+  }
+}

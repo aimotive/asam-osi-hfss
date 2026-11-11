@@ -1,0 +1,5 @@
+#!/bin/sh
+# Sensor model of today's OSI: SensorView (upstream reflections) -> SensorData.
+# Usage: legacy-sensor-model --sensor-view F [-o F]
+# This launcher runs the implementation in lib/radar-modules; replace it to use another implementation.
+exec "$(dirname "$0")/lib/radar-modules" legacy-sensor-model "$@"

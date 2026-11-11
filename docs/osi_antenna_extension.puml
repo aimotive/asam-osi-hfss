@@ -36,6 +36,8 @@ package "osi_sensorview.proto" {
         + double arrival_horizontal_angle
         + double arrival_vertical_angle
         + JonesMatrix polarimetric_response
+        + uint32 number_of_interactions
+        + Identifier object_id
     }
 }
 
@@ -48,6 +50,8 @@ package "osi_antenna.proto (new)" {
     }
 
     enum PolarizationBasis {
+        UNKNOWN
+        OTHER
         LINEAR_HV
         CIRCULAR_LR
     }
@@ -59,6 +63,8 @@ package "osi_antenna.proto (new)" {
     }
 
     enum Mode {
+        UNKNOWN
+        OTHER
         RECEIVE
         TRANSMIT
     }
@@ -118,15 +124,9 @@ FrequencyInstance o-- JonesPattern
 JonesPattern o-- ComplexGrid
 JonesMatrix o-- ComplexValue
 
-note bottom of AntennaModel
-  src/antenna/element.py mirrors this package one to one
-  and adds evaluation: jones(), response(), receive(), elements(mode),
-  resampled(step) and Direction.
-end note
-
 legend right
   + marks fields added by the osi-hfss fork;
-  all other fields are unchanged upstream OSI v3.8.0
+  all other fields are unchanged upstream OSI v3.8.0.
 endlegend
 
 @enduml

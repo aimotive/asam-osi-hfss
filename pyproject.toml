@@ -20,4 +20,8 @@ where = ["src"]
 [dependency-groups]
 dev = [
     "grpcio-tools == 1.84.*",
+    "pytest == 9.*",
 ]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

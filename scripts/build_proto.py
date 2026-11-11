@@ -1,7 +1,7 @@
 """Generate the ``osi3`` Python bindings from the OSI submodule.
 
-The submodule tracks the upstream OSI branch ``feature/antenna-model``, which
-contains the antenna extension on top of OSI v3.8.0. Use ``--upstream-only``
+The submodule tracks the upstream OSI branch ``feature/radar-sensor-concept``, which
+contains the antenna, reflection and radar CPI extensions on top of OSI v3.8.0. Use ``--upstream-only``
 to build the plain upstream release it is based on instead.
 
     uv run python scripts/build_proto.py [--upstream-only]
@@ -92,7 +92,7 @@ def main() -> None:
     write_protos(read_sources(UPSTREAM_REF if args.upstream_only else None))
     compile_protos()
 
-    variant = f"upstream {UPSTREAM_REF}" if args.upstream_only else "feature/antenna-model"
+    variant = f"upstream {UPSTREAM_REF}" if args.upstream_only else "feature/radar-sensor-concept"
     print(f"Generated osi3 bindings ({variant}) in {OUT_DIR / 'osi3'}")
 
 

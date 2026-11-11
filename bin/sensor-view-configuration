@@ -1,0 +1,6 @@
+#!/bin/sh
+# Configuration module: SensorViewConfiguration + AntennaModel -> SensorViewConfiguration with the antenna_model
+# and the legacy diagrams derived from it.
+# Usage: sensor-view-configuration --base F --antenna F [--diagram-step H_DEG,V_DEG] [-o F]
+# This launcher runs the implementation in lib/radar-modules; replace it to use another implementation.
+exec "$(dirname "$0")/lib/radar-modules" sensor-view-configuration "$@"

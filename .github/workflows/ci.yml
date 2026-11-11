@@ -1,0 +1,29 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    # The modules in bin/ are Linux x86-64 programs built on Ubuntu 24.04
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.12"
+      - name: Install the Python environment
+        run: uv sync --locked
+      - name: Generate the osi3 bindings
+        run: uv run python scripts/build_proto.py
+      - name: Check that the modules run
+        run: bin/radar-dsp --help > /dev/null
+      - name: Build the example data with the modules
+        run: uv run python -c "from osi_hfss import pipeline; print(len(pipeline.build_all()), 'data files built')"
+      - name: Tests
+        run: uv run pytest
+      - name: Run every notebook
+        run: uv run jupyter nbconvert --to notebook --execute --output-dir /tmp/notebooks notebooks/*/*.ipynb

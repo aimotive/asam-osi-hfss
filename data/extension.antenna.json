@@ -1,0 +1,13 @@
+{
+ "layout": "tx_ula",
+ "frequency": 77000000000.0,
+ "n_tx": 1,
+ "n_rx": 8,
+ "tx_position_wavelengths": -3.0,
+ "polarization": 0,
+ "gain_db": 20.0,
+ "cross_polar": 0.1,
+ "grid_step_deg": 2.0,
+ "grid_source_points": 1001,
+ "coupling": 0.0
+}

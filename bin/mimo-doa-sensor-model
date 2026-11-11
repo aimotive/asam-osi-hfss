@@ -1,0 +1,5 @@
+#!/bin/sh
+# MIMO DOA sensor model: SensorView (antenna-free reflections + MIMO antenna_model) -> SensorData.
+# Usage: mimo-doa-sensor-model --sensor-view F [--transmitters N] [--analysis F.npz] [-o F]
+# This launcher runs the implementation in lib/radar-modules; replace it to use another implementation.
+exec "$(dirname "$0")/lib/radar-modules" mimo-doa-sensor-model "$@"

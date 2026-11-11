@@ -1,0 +1,5 @@
+#!/bin/sh
+# Beam scan: AntennaModel -> beam pattern of a linear array (.npz).
+# Usage: beam-scan --antenna F --steer DEG [--taper uniform|hann] [--frequency HZ] [--mode receive|transmit] [-o F]
+# This launcher runs the implementation in lib/radar-modules; replace it to use another implementation.
+exec "$(dirname "$0")/lib/radar-modules" beam-scan "$@"
