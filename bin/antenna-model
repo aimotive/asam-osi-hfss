@@ -1,0 +1,5 @@
+#!/bin/sh
+# Array description (JSON) -> AntennaModel.
+# Usage: antenna-model --config F.json [-o F]
+# This launcher runs the implementation in lib/radar-modules; replace it to use another implementation.
+exec "$(dirname "$0")/lib/radar-modules" antenna-model "$@"

@@ -1,0 +1,119 @@
+@startuml osi_radarcpi
+
+package "osi_radarcpi.proto (new)" {
+    struct RadarCpiData {
+        InterfaceVersion version
+        Timestamp timestamp
+        Identifier sensor_id
+        RadarSensorViewConfiguration view_configuration
+        array<RadarCpiFrame> cpi_frame
+    }
+
+    struct RadarCpiFrame {
+        uint64 cpi_index
+        Timestamp start_time
+        RadarCpiAxis fast_axis
+        RadarCpiAxis slow_axis
+        array<RadarCpiChannel> channel
+        array<RadarCpiTransmitter> transmitter
+        double center_frequency
+        double noise_power
+        SampleFormat sample_format
+        DataEncoding data_encoding
+        double scale_factor
+        bytes data
+        Identifier configuration_id
+    }
+
+    struct RadarCpiAxis {
+        Domain domain
+        uint32 size
+        double spacing
+        double offset
+        Window window
+    }
+
+    struct RadarCpiChannel {
+        uint32 index
+        Kind kind
+        uint32 rx_index
+        uint32 tx_index
+        Vector3d position
+        double time_offset
+        uint32 rx_port
+    }
+
+    struct RadarCpiTransmitter {
+        uint32 index
+        Vector3d position
+        ComplexValue excitation_0
+        ComplexValue excitation_1
+    }
+
+    enum SampleFormat {
+        UNKNOWN
+        OTHER
+        COMPLEX_IQ
+        REAL
+    }
+
+    enum DataEncoding {
+        UNKNOWN
+        OTHER
+        FLOAT32
+        FLOAT64
+        INT16
+    }
+
+    enum Domain {
+        UNKNOWN
+        OTHER
+        FAST_TIME
+        RANGE
+        SLOW_TIME
+        DOPPLER
+    }
+
+    enum Window {
+        UNKNOWN
+        OTHER
+        NONE
+        HANN
+        HAMMING
+        BLACKMAN
+        CHEBYSHEV
+        TAYLOR
+    }
+
+    enum Kind {
+        UNKNOWN
+        OTHER
+        PHYSICAL
+        VIRTUAL
+    }
+}
+
+package "osi_sensorviewconfiguration.proto" {
+    struct RadarSensorViewConfiguration
+}
+
+package "osi_antenna.proto (new)" {
+    struct AntennaElement
+    struct ComplexValue
+}
+
+RadarCpiData o-- "0..*" RadarCpiFrame
+RadarCpiData o-- RadarSensorViewConfiguration : echo of the SensorView
+RadarCpiFrame o-- "2" RadarCpiAxis : fast, slow
+RadarCpiFrame o-- "1..*" RadarCpiChannel
+RadarCpiFrame o-- "0..*" RadarCpiTransmitter
+RadarCpiFrame o-- SampleFormat
+RadarCpiFrame o-- DataEncoding
+RadarCpiAxis o-- Domain
+RadarCpiAxis o-- Window
+RadarCpiChannel o-- Kind
+RadarCpiChannel ..> AntennaElement : rx_index, tx_index
+RadarCpiTransmitter ..> AntennaElement : index
+RadarCpiTransmitter o-- ComplexValue
+
+@enduml

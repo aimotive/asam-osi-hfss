@@ -1,0 +1,204 @@
+@startuml radar_signal_chain
+
+package "I-1 ray paths (RadarSensorView.Reflection)" {
+    struct RayBundle {
+        double emitter_frequency
+        array<complex 2x2> polarimetric_response
+        array<double> time_of_flight
+        array<double> doppler_shift
+        array<double> source_horizontal_angle
+        array<double> source_vertical_angle
+        array<double> arrival_horizontal_angle
+        array<double> arrival_vertical_angle
+        array<int> number_of_interactions
+        array<int> object_id
+    }
+}
+
+package "signal generator" {
+    interface SignalGenerator {
+        generate(RayBundle, AntennaModel, start_time, cpi_index) : CpiFrame
+    }
+    struct FmcwMimoConfig {
+        double start_frequency
+        double bandwidth
+        double ramp_duration
+        double idle_time
+        double adc_start_time
+        double sample_rate
+        int samples_per_chirp
+        int loops
+        array<int> tx_sequence
+        double tx_power_dbm
+        double noise_figure_db
+        complex tx_excitation[2]
+        int rx_port
+        int configuration_id
+        ChannelKind output_channels
+        Domain output_domain
+        waveform() : FmcwWaveform
+    }
+    SignalGenerator o-- FmcwMimoConfig
+    struct PmcwCdmConfig {
+        double carrier_frequency
+        double chip_rate
+        int code_degree
+        int code_repetitions
+        int slow_samples
+        bool range_migration
+        array<int> tx_indices
+        double tx_power_dbm
+        double noise_figure_db
+        complex tx_excitation[2]
+        int rx_port
+        int configuration_id
+        ChannelKind output_channels
+        Domain output_domain
+        waveform() : PmcwWaveform
+    }
+    SignalGenerator o-- PmcwCdmConfig
+}
+
+package "waveform (radar configuration, not OSI)" {
+    abstract class Waveform {
+        double center_frequency
+        double wavelength
+        double range_resolution
+        double unambiguous_range
+        demultiplex(CpiFrame) : CpiFrame
+        to_range(CpiFrame, Window) : CpiFrame
+    }
+    struct FmcwWaveform {
+        double start_frequency
+        double slope
+        double sample_rate
+        double adc_start_time
+        int samples_per_chirp
+        double chirp_repetition_interval
+        int chirps_per_cpi
+        array<int> tx_sequence
+    }
+    struct PmcwWaveform {
+        double carrier_frequency
+        double chip_rate
+        array<int> tx_indices
+        double codes[tx, chip]
+        int code_repetitions
+        int range_bins
+    }
+    FmcwWaveform --|> Waveform
+    PmcwWaveform --|> Waveform
+}
+
+package "I-2 CPI (RadarCpiFrame)" {
+    struct CpiFrame {
+        int cpi_index
+        int configuration_id
+        double start_time
+        CpiAxis fast_axis
+        CpiAxis slow_axis
+        array<CpiChannel> channel
+        array<CpiTransmitter> transmitter
+        double center_frequency
+        double noise_power
+        SampleFormat sample_format
+        complex data[channel, slow, fast]
+    }
+    struct CpiAxis {
+        Domain domain
+        int size
+        double spacing
+        double offset
+        Window window
+    }
+    struct CpiChannel {
+        int index
+        ChannelKind kind
+        int rx_index
+        int tx_index
+        Vector3d position
+        double time_offset
+        int rx_port
+    }
+    struct CpiTransmitter {
+        int index
+        Vector3d position
+        complex excitation[2]
+    }
+    enum ChannelKind {
+        UNKNOWN
+        OTHER
+        PHYSICAL
+        VIRTUAL
+    }
+    enum Domain {
+        UNKNOWN
+        OTHER
+        FAST_TIME
+        RANGE
+        SLOW_TIME
+        DOPPLER
+    }
+    enum Window {
+        UNKNOWN
+        OTHER
+        NONE
+        HANN
+        HAMMING
+        BLACKMAN
+        CHEBYSHEV
+        TAYLOR
+    }
+    enum SampleFormat {
+        UNKNOWN
+        OTHER
+        COMPLEX_IQ
+        REAL
+    }
+    CpiFrame *-- "2" CpiAxis
+    CpiFrame *-- "1..*" CpiChannel
+    CpiFrame *-- "0..*" CpiTransmitter
+}
+
+package "osi_antenna.proto" {
+    struct AntennaModel
+}
+
+package "DSP" {
+    struct Detection {
+        double range
+        double range_rate
+        double azimuth
+        double snr_db
+    }
+    class "dsp" as dsp_simple <<module>> {
+        range-Doppler, CFAR, DOA (phase centres or AntennaModel)
+    }
+}
+
+package "bin/ (one executable per module, inputs and outputs are OSI messages only)" {
+    class "modules" as osi_modules <<executables>> {
+        environment-simulation (GroundTruth, SensorViewConfiguration, scene) : SensorView
+        antenna-model (array description) : AntennaModel
+        fmcw-signal-generator (SensorView, AntennaModel, configuration) : RadarCpiData
+        pmcw-signal-generator (SensorView, AntennaModel, configuration) : RadarCpiData
+        legacy- / doa- / mimo-doa-sensor-model (SensorView) : SensorData
+        radar-dsp (RadarCpiData, AntennaModel) : SensorData
+        beam-scan (AntennaModel) : beam pattern
+    }
+}
+
+SignalGenerator ..> RayBundle : consumes
+SignalGenerator ..> AntennaModel : applies
+SignalGenerator ..> CpiFrame : produces
+SignalGenerator ..> Waveform : transmits
+Waveform ..> CpiFrame : demultiplex, to_range
+CpiChannel ..> AntennaModel : element indices
+dsp_simple ..> CpiFrame : processes
+dsp_simple ..> Waveform : demultiplex, to_range (PHYSICAL / FAST_TIME only)
+dsp_simple ..> Detection : produces
+dsp_simple ..> AntennaModel : element patterns (DOA)
+osi_modules ..> SignalGenerator : signal generator modules
+osi_modules ..> dsp_simple : dsp module
+
+@enduml

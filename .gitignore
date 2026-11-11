@@ -5,3 +5,8 @@
 # generated protobuf bindings
 build/
 src/osi3/
+*.png
+*.bin
+
+!data/*.bin
+!tests/reference/*.bin

@@ -1,0 +1,5 @@
+#!/bin/sh
+# Radar DSP: RadarCpiData (+ AntennaModel) -> SensorData (range-Doppler, CFAR, DOA).
+# Usage: radar-dsp --cpi F [--antenna F] [--analysis F.npz] [-o F]
+# This launcher runs the implementation in lib/radar-modules; replace it to use another implementation.
+exec "$(dirname "$0")/lib/radar-modules" radar-dsp "$@"

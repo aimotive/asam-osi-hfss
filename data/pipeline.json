@@ -1,0 +1,288 @@
+{
+ "description": "Data files that a module produces.",
+ "files": {
+  "front.sensorview.bin": {
+   "module": "environment-simulation",
+   "inputs": {
+    "ground-truth": "front.groundtruth.bin",
+    "configuration": "front.sensorviewconfiguration.bin",
+    "scene": "front.scene.json"
+   }
+  },
+  "front.antennamodel.bin": {
+   "module": "antenna-model",
+   "inputs": {
+    "config": "front.antenna.json"
+   }
+  },
+  "front.radarcpidata.bin": {
+   "module": "fmcw-signal-generator",
+   "inputs": {
+    "sensor-view": "front.sensorview.bin",
+    "antenna": "front.antennamodel.bin",
+    "config": "front.signal_generator.json"
+   }
+  },
+  "front.raw.radarcpidata.bin": {
+   "module": "fmcw-signal-generator",
+   "inputs": {
+    "sensor-view": "front.sensorview.bin",
+    "antenna": "front.antennamodel.bin",
+    "config": "front.signal_generator.json"
+   },
+   "options": [
+    "--raw"
+   ]
+  },
+  "front.sensordata.bin": {
+   "module": "radar-dsp",
+   "inputs": {
+    "cpi": "front.radarcpidata.bin",
+    "antenna": "front.antennamodel.bin"
+   }
+  },
+  "front.dsp.npz": {
+   "module": "radar-dsp",
+   "inputs": {
+    "cpi": "front.radarcpidata.bin",
+    "antenna": "front.antennamodel.bin"
+   },
+   "output": "analysis"
+  },
+  "front.phase_centre.sensordata.bin": {
+   "module": "radar-dsp",
+   "inputs": {
+    "cpi": "front.radarcpidata.bin"
+   }
+  },
+  "front.raw_noise_free.radarcpidata.bin": {
+   "module": "fmcw-signal-generator",
+   "inputs": {
+    "sensor-view": "front.sensorview.bin",
+    "antenna": "front.antennamodel.bin",
+    "config": "front.signal_generator.json"
+   },
+   "options": [
+    "--raw",
+    "--noise-free"
+   ]
+  },
+  "front.int16.radarcpidata.bin": {
+   "module": "fmcw-signal-generator",
+   "inputs": {
+    "sensor-view": "front.sensorview.bin",
+    "antenna": "front.antennamodel.bin",
+    "config": "front.signal_generator.json"
+   },
+   "options": [
+    "--encoding",
+    "int16"
+   ]
+  },
+  "corner.sensorview.bin": {
+   "module": "environment-simulation",
+   "inputs": {
+    "ground-truth": "corner.groundtruth.bin",
+    "configuration": "corner.sensorviewconfiguration.bin",
+    "scene": "corner.scene.json"
+   }
+  },
+  "corner.antennamodel.bin": {
+   "module": "antenna-model",
+   "inputs": {
+    "config": "corner.antenna.json"
+   }
+  },
+  "corner.radarcpidata.bin": {
+   "module": "pmcw-signal-generator",
+   "inputs": {
+    "sensor-view": "corner.sensorview.bin",
+    "antenna": "corner.antennamodel.bin",
+    "config": "corner.signal_generator.json"
+   }
+  },
+  "corner.raw.radarcpidata.bin": {
+   "module": "pmcw-signal-generator",
+   "inputs": {
+    "sensor-view": "corner.sensorview.bin",
+    "antenna": "corner.antennamodel.bin",
+    "config": "corner.signal_generator.json"
+   },
+   "options": [
+    "--raw"
+   ]
+  },
+  "corner.sensordata.bin": {
+   "module": "radar-dsp",
+   "inputs": {
+    "cpi": "corner.radarcpidata.bin",
+    "antenna": "corner.antennamodel.bin"
+   }
+  },
+  "corner.dsp.npz": {
+   "module": "radar-dsp",
+   "inputs": {
+    "cpi": "corner.radarcpidata.bin",
+    "antenna": "corner.antennamodel.bin"
+   },
+   "output": "analysis"
+  },
+  "corner.phase_centre.sensordata.bin": {
+   "module": "radar-dsp",
+   "inputs": {
+    "cpi": "corner.radarcpidata.bin"
+   }
+  },
+  "corner.pmcw.npz": {
+   "module": "pmcw-signal-generator",
+   "inputs": {
+    "sensor-view": "corner.sensorview.bin",
+    "antenna": "corner.antennamodel.bin",
+    "config": "corner.signal_generator.json"
+   },
+   "options": [
+    "--raw"
+   ],
+   "output": "analysis"
+  },
+  "legacy.sensorview.bin": {
+   "module": "environment-simulation",
+   "inputs": {
+    "ground-truth": "legacy.groundtruth.bin",
+    "configuration": "legacy.sensorviewconfiguration.bin",
+    "scene": "legacy.scene.json"
+   }
+  },
+  "legacy.sensordata.bin": {
+   "module": "legacy-sensor-model",
+   "inputs": {
+    "sensor-view": "legacy.sensorview.bin"
+   }
+  },
+  "extension.antennamodel.bin": {
+   "module": "antenna-model",
+   "inputs": {
+    "config": "extension.antenna.json"
+   }
+  },
+  "extension.sensorviewconfiguration.bin": {
+   "module": "sensor-view-configuration",
+   "inputs": {
+    "base": "legacy.sensorviewconfiguration.bin",
+    "antenna": "extension.antennamodel.bin"
+   }
+  },
+  "extension.sensorview.bin": {
+   "module": "environment-simulation",
+   "inputs": {
+    "ground-truth": "extension.groundtruth.bin",
+    "configuration": "extension.sensorviewconfiguration.bin",
+    "scene": "extension.scene.json"
+   }
+  },
+  "extension_mimo.antennamodel.bin": {
+   "module": "antenna-model",
+   "inputs": {
+    "config": "extension_mimo.antenna.json"
+   }
+  },
+  "extension_mimo.sensorviewconfiguration.bin": {
+   "module": "sensor-view-configuration",
+   "inputs": {
+    "base": "legacy.sensorviewconfiguration.bin",
+    "antenna": "extension_mimo.antennamodel.bin"
+   }
+  },
+  "extension_mimo.sensorview.bin": {
+   "module": "environment-simulation",
+   "inputs": {
+    "ground-truth": "extension_mimo.groundtruth.bin",
+    "configuration": "extension_mimo.sensorviewconfiguration.bin",
+    "scene": "extension.scene.json"
+   }
+  },
+  "extension.sensordata.bin": {
+   "module": "doa-sensor-model",
+   "inputs": {
+    "sensor-view": "extension.sensorview.bin"
+   }
+  },
+  "extension.doa.npz": {
+   "module": "doa-sensor-model",
+   "inputs": {
+    "sensor-view": "extension.sensorview.bin"
+   },
+   "output": "analysis"
+  },
+  "extension_mimo.sensordata.bin": {
+   "module": "mimo-doa-sensor-model",
+   "inputs": {
+    "sensor-view": "extension_mimo.sensorview.bin"
+   }
+  },
+  "extension_mimo.npz": {
+   "module": "mimo-doa-sensor-model",
+   "inputs": {
+    "sensor-view": "extension_mimo.sensorview.bin"
+   },
+   "output": "analysis"
+  },
+  "extension_mimo.simo.sensordata.bin": {
+   "module": "mimo-doa-sensor-model",
+   "inputs": {
+    "sensor-view": "extension_mimo.sensorview.bin"
+   },
+   "options": [
+    "--transmitters",
+    "1"
+   ]
+  },
+  "extension_mimo.simo.npz": {
+   "module": "mimo-doa-sensor-model",
+   "inputs": {
+    "sensor-view": "extension_mimo.sensorview.bin"
+   },
+   "options": [
+    "--transmitters",
+    "1"
+   ],
+   "output": "analysis"
+  },
+  "ula.antennamodel.bin": {
+   "module": "antenna-model",
+   "inputs": {
+    "config": "ula.antenna.json"
+   }
+  },
+  "ula.beam_scan.npz": {
+   "module": "beam-scan",
+   "inputs": {
+    "antenna": "ula.antennamodel.bin"
+   },
+   "options": [
+    "--steer",
+    "20",
+    "--taper",
+    "hann"
+   ]
+  },
+  "front.generator_description.json": {
+   "module": "fmcw-signal-generator",
+   "inputs": {
+    "sensor-view": "front.sensorview.bin",
+    "antenna": "front.antennamodel.bin",
+    "config": "front.signal_generator.json"
+   },
+   "output": "description"
+  },
+  "corner.generator_description.json": {
+   "module": "pmcw-signal-generator",
+   "inputs": {
+    "sensor-view": "corner.sensorview.bin",
+    "antenna": "corner.antennamodel.bin",
+    "config": "corner.signal_generator.json"
+   },
+   "output": "description"
+  }
+ }
+}

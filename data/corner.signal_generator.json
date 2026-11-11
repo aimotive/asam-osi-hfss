@@ -1,0 +1,32 @@
+{
+ "carrier_frequency": 79000000000.0,
+ "chip_rate": 1000000000.0,
+ "code_degree": 10,
+ "code_repetitions": 32,
+ "slow_samples": 256,
+ "tx_indices": [
+  0,
+  1,
+  2,
+  3
+ ],
+ "tx_power_dbm": 10.0,
+ "noise_figure_db": 14.0,
+ "tx_excitation": [
+  [
+   0.0,
+   0.0
+  ],
+  [
+   1.0,
+   0.0
+  ]
+ ],
+ "rx_port": 1,
+ "add_noise": true,
+ "seed": 0,
+ "configuration_id": 2,
+ "range_migration": false,
+ "output_channels": "VIRTUAL",
+ "output_domain": "RANGE"
+}

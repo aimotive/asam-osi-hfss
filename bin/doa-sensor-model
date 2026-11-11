@@ -1,0 +1,5 @@
+#!/bin/sh
+# DOA sensor model: SensorView (antenna-free reflections + antenna_model) -> SensorData.
+# Usage: doa-sensor-model --sensor-view F [--snr-threshold DB] [--analysis F.npz] [-o F]
+# This launcher runs the implementation in lib/radar-modules; replace it to use another implementation.
+exec "$(dirname "$0")/lib/radar-modules" doa-sensor-model "$@"

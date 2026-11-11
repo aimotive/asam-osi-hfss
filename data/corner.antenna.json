@@ -1,0 +1,13 @@
+{
+ "layout": "mimo",
+ "frequency": 79000000000.0,
+ "n_tx": 4,
+ "n_rx": 4,
+ "tx_position_wavelengths": 0.0,
+ "polarization": 1,
+ "gain_db": 20.0,
+ "cross_polar": 0.1,
+ "grid_step_deg": 1.0,
+ "grid_source_points": 0,
+ "coupling": 0.1
+}
